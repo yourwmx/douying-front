@@ -1,0 +1,19 @@
+{
+  "pages": [
+    "pages/index/login",
+    "pages/index/index",
+    "pages/index/mine",
+    "pages/index/takeVideo",
+    "pages/index/editData",
+    "pages/index/update",
+    "pages/index/updateLocation"
+  ],
+  "subPackages": [],
+  "window": {
+    "navigationBarTextStyle": "white",
+    "navigationBarTitleText": "uni-app",
+    "navigationBarBackgroundColor": "#007AFF",
+    "backgroundColor": "#FFFFFF"
+  },
+  "usingComponents": {}
+}

@@ -1,0 +1,14 @@
+
+page {
+	background-color: #000000;
+	color: #FFFFFF;
+}
+input {
+	margin-top: 30px;
+	margin-bottom: 30px;
+	font-size: large;
+}
+button {
+	text-align: center;
+}
+

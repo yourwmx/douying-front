@@ -1,0 +1,1 @@
+<view><block wx:for="{{locationInfo}}" wx:for-item="item" wx:for-index="index" wx:key="index"><block><view data-event-opts="{{[['tap',[['toUpdataLocation',[index]]]]]}}" style="margin:20px;display:flex;" bindtap="__e"><text>{{item.v}}</text><image class="jiantou" src="../../static/image/jiantou.png"></image></view></block></block></view>
