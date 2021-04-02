@@ -2,7 +2,7 @@
 	<view>
 		<view style="position: absolute; top:40%; width: 100%;">
 			<view style="width: 100%; text-align: center; font-size: 50px;">星奇视频</view>
-			<button style="margin-top: 50px; width: 80%; height: 100%;" @click="toIndex()">微信登录</button>
+			<button style="margin-top: 50px; width: 80%; height: 100%;" open-type="getUserInfo" @click="toIndex()">微信登录</button>
 		</view>
 	</view>
 </template>

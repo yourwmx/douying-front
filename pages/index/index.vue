@@ -13,7 +13,7 @@
 			</view>
 			<view class="top_right">
 				<navigator>
-					<image src="../../static/image/sousuo.png" style="width: 25px;height: 25px;"></image>
+					<image src="../../static/image/sousuo.png" style="width: 25px;height: 25px;" @click="toSearch()"></image>
 				</navigator>
 			</view>
 		</view>
@@ -27,10 +27,10 @@
 						<swiper-item>
 							<view style="width: 100%; height: 100%">
 								<view style="width: 100%; height: 100%" @click="focus_playPause(index)">
-									<video v-if="(focus_imgList[index] == 0)" :id="'focus_video' + index" :src="ip+item.mediaUrl" :style="{width:100+'%',height: phoneHeight-50+'px'}"
+									<video v-if="(focus_imgList[index] == 0)" :id="'focus_video' + index" :src="item.mediaUrl" :style="{width:100+'%',height: phoneHeight-50+'px'}"
 									 :controls="false" objectFit="cover">
 									</video>
-									<image v-if="(focus_imgList[index] == 1)" :src="ip+item.mediaUrl" :style="{width: 100 + '%', height: phoneHeight + 'px'}"></image>
+									<image v-if="(focus_imgList[index] == 1)" :src="item.mediaUrl" :style="{width: 100 + '%', height: phoneHeight + 'px'}"></image>
 									<view id="bofang" class="bofang" v-show="focus_isbofang==0">
 										<img src="../../static/image/bofang.png" style="width: 50px; height: 50px;"></img>
 									</view>
@@ -80,10 +80,10 @@
 						<swiper-item>
 							<view style="width: 100%; height: 100%">
 								<view style="width: 100%; height: 100%" @click="playPause(index)">
-									<video v-if="(imgList[index] == 0)" :id="'video' + index" :src="ip+item.mediaUrl" :style="{width:100+'%',height: phoneHeight-50+'px'}"
+									<video v-if="(imgList[index] == 0)" :id="'video' + index" :src="item.mediaUrl" :style="{width:100+'%',height: phoneHeight-50+'px'}"
 									 :controls="false" objectFit="cover">
 									</video>
-									<image v-if="(imgList[index] == 1)" :src="ip+item.mediaUrl" :style="{width: 100 + '%', height: phoneHeight + 'px'}"></image>
+									<image v-if="(imgList[index] == 1)" :src="item.mediaUrl" :style="{width: 100 + '%', height: phoneHeight + 'px'}"></image>
 									<view id="bofang" class="bofang" v-show="isbofang==0">
 										<img src="../../static/image/bofang.png" style="width: 50px; height: 50px;"></img>
 									</view>
@@ -92,9 +92,12 @@
 							<view class="bottom_right">
 								<view class="bottom_right_button">
 									<view><img :src="item.photo" style="width: 40px; height: 40px; border-radius: 20px;" @click="toMine(item.userId,fList[index],index,1)"></img></view>
-									<view @click="guanzhu(index)"><img v-show="fList[index] == 0" class="guanzhu" src="../../static/image/guanzhu.png"
+									<view @click="guanzhu(index)">
+										<img v-show="fList[index] == 0" class="guanzhu" src="../../static/image/guanzhu.png"
 										 style="width: 15px; height: 15px"></img>
-										<img v-if="fList[index] == 1" class="guanzhu" src="../../static/image/dagou.png" style="width: 15px; height: 15px"></img></view>
+										<img v-if="fList[index] == 1" class="guanzhu" src="../../static/image/dagou.png"
+										 style="width: 15px; height: 15px"></img>
+									</view>
 								</view>
 								<view @click="dianzan(index)" class="bottom_right_button">
 									<img v-show="(lList[index] == 0)" src="../../static/image/weidianzan.png" style="width: 40px; height: 40px">
@@ -201,8 +204,8 @@
 	export default {
 		data() {
 			return {
-				ip: "http://127.0.0.1:8080",
-				// ip: "http://47.112.224.214:8080",
+				// ip: "http://127.0.0.1:8080",
+				ip: "http://120.25.107.83:8080",
 				isplay: true,
 				focus_isplay: true,
 				isbofang: 1,
@@ -278,20 +281,28 @@
 			listMedias() {
 				// 获取媒体列表
 				request.listMedias({
-					userId: this.userId
+					userId: this.userId,
+					pageSize: 100,
+					pageNum: 1
 				}).then(data => {
-					console.log(data)
-					this.vList = data.data;
+					console.log('here',data)
+					this.vList = data.data.list;
 					this.initMedia();
 				});
 			},
 			focus_listMedias() {
+				// 如果被关注用户列表为空，则给一个0，让后台查不到数据
+				if(this.beFocusList.length == 0){
+					this.beFocusList += '0'
+				}
 				// 获取媒体列表
 				request.listMedias({
-					userId: this.beFocusList
+					userId: this.beFocusList,
+					pageSize: 100,
+					pageNum: 1
 				}).then(data => {
 					console.log('focus_listMedias',data)
-					this.focus_vList = data.data;
+					this.focus_vList = data.data.list;
 					this.focus_initMedia();
 					this.focus_queryLikeMediaBusinessId();
 				});
@@ -299,15 +310,16 @@
 			listFocusUserIds() {
 				// 获取关注用户列表
 				request.listFocusUserIds({
-					focusUserId: uni.getStorageSync('currentUserId')
+					focusUserId: uni.getStorageSync('currentUserId'),
+					pageSize: 100,
+					pageNum: 1
 				}).then(data => {
 					console.log(data.data)
-					let beFocusUserIdList = data.data,
-						flag = 0;
-					this.beFocusList = [];
+					let beFocusUserIdList = data.data;
+					this.beFocusList = '';
 					//将被关注人的编号用，连接
 					for (let i = 0; i < beFocusUserIdList.length; i++) {
-						if (flag == 0) {
+						if (i == 0) {
 							this.beFocusList += beFocusUserIdList[i].beFocusUserId;
 						} else {
 							this.beFocusList = this.beFocusList + ',' + beFocusUserIdList[i].beFocusUserId;
@@ -334,10 +346,10 @@
 									console.log(data);
 									//由于以openid作唯一标识当用户主键，所以检验表中是否有该主键
 									if (data.code == "10000") {
-										uni.setStorageSync('currentUserId', data.data);
+										uni.setStorageSync('currentUserId', data.msg);
 										//若没有,则添加该用户到表中
 										request.addUser({
-											userId: data.data,
+											userId: data.msg,
 											account: infoRes.userInfo.nickName,
 											name: infoRes.userInfo.nickName,
 											photo: infoRes.userInfo.avatarUrl,
@@ -369,6 +381,8 @@
 			},
 			// 初始化视频信息
 			initMedia() {
+				this.mediaIdList = [];
+				this.userIdList = [];
 				this.videoContextList = [];
 				this.audioContextList = [];
 				this.imgList = [];
@@ -376,8 +390,9 @@
 					// 初始化imgList，01数组，1代表是照片
 					let tmpUrl = this.vList[i].mediaUrl;
 					console.log(tmpUrl)
-					let tmp = tmpUrl.split(".");
-					if (tmp[1] == "mp4") {
+					// 以.分割，获取最后的字符串
+					let tmp = tmpUrl.split('.')[tmpUrl.split('.').length - 1];
+					if (tmp == "mp4") {
 						this.imgList.push(0);
 					} else {
 						this.imgList.push(1);
@@ -388,7 +403,7 @@
 						this.audioContextList.push('')
 					} else {
 						let innerAudioContext = uni.createInnerAudioContext();
-						innerAudioContext.src = this.ip + this.vList[i].musicUrl;
+						innerAudioContext.src = this.vList[i].musicUrl;
 						this.audioContextList.push(innerAudioContext)
 					}
 					//将每个mediaUrl放入mediaIdList中
@@ -405,6 +420,8 @@
 			},
 			// 初始化视频信息（关注）
 			focus_initMedia() {
+				this.focus_mediaIdList = [];
+				this.focus_userIdList = [];
 				this.focus_videoContextList = [];
 				this.focus_audioContextList = [];
 				this.focus_imgList = [];
@@ -412,8 +429,9 @@
 					// 初始化imgList，01数组，1代表是照片
 					let tmpUrl = this.focus_vList[i].mediaUrl;
 					console.log(tmpUrl)
-					let tmp = tmpUrl.split(".");
-					if (tmp[1] == "mp4") {
+					// 以.分割，获取最后的字符串
+					let tmp = tmpUrl.split('.')[tmpUrl.split('.').length - 1];
+					if (tmp == "mp4") {
 						this.focus_imgList.push(0);
 					} else {
 						this.focus_imgList.push(1);
@@ -424,7 +442,7 @@
 						this.focus_audioContextList.push('')
 					} else {
 						let innerAudioContext = uni.createInnerAudioContext();
-						innerAudioContext.src = this.ip + this.focus_vList[i].musicUrl;
+						innerAudioContext.src = this.focus_vList[i].musicUrl;
 						this.focus_audioContextList.push(innerAudioContext)
 					}
 					//将每个mediaUrl放入mediaIdList中
@@ -491,6 +509,9 @@
 				console.log(e)
 				let curIndex = e.detail.current;
 				if(curIndex == 0){// 推荐->关注
+					this.listFocusUserIds();
+					this.focus_queryFocusUserBusinessId();
+					this.focus_queryLikeMediaBusinessId();
 					this.videoContextList[this.videoIndex].pause();
 					this.videoContextList[this.videoIndex].seek(0);
 					if (this.audioContextList[this.videoIndex] != '') {
@@ -503,6 +524,9 @@
 						this.focus_audioContextList[this.focus_videoIndex].play();
 					}
 				}else{// 关注->推荐
+					this.initMedia();
+					this.queryFocusUserBusinessId();
+					this.queryLikeMediaBusinessId();
 					this.focus_videoContextList[this.focus_videoIndex].pause();
 					this.focus_videoContextList[this.focus_videoIndex].seek(0);
 					if (this.focus_audioContextList[this.focus_videoIndex] != '') {
@@ -550,6 +574,7 @@
 			},
 			// 我的
 			toMine(userId, status, index, current) {
+				// current 0表示在关注页面 1表示在推荐页面
 				if (userId == null) {
 					userId = uni.getStorageSync('currentUserId');
 				}
@@ -706,7 +731,7 @@
 					})
 				}
 			},
-			focus_guanzhu(index) { // 关注
+			focus_guanzhu(index) { // 关注 (关注)
 				var self = this;
 				if (this.focus_fList[index] == 0) { //未关注->已关注
 					this.focus_fList[index] = 1;
@@ -718,6 +743,7 @@
 						self.focus_fList = []
 						self.focus_queryFocusUserBusinessId();
 					})
+					this.listFocusUserIds();
 				} else { //已关注->取消关注
 					this.focus_fList[index] = 0;
 					this.$forceUpdate();
@@ -728,9 +754,10 @@
 						self.focus_fList = []
 						self.focus_queryFocusUserBusinessId();
 					})
+					// this.listFocusUserIds();
 				}
 			},
-			pinglun(currentStatu) {
+			pinglun(currentStatu) {// 评论
 				console.log(currentStatu);
 				//关闭抽屉
 				if (currentStatu == "close") {
@@ -748,7 +775,7 @@
 				}
 				console.log(this.showModalStatus)
 			},
-			listComment() {
+			listComment() {// 获取评论列表
 				let mediaId;
 				if(this.verticalIndex == 0){
 					mediaId = this.focus_vList[this.focus_videoIndex].mediaId
@@ -757,7 +784,10 @@
 				}
 				//获取评论列表
 				request.listComments({
-					mediaId: mediaId
+					mediaId: mediaId,
+					pageSize: 100,
+					pageNum: 1,
+					lastCommentId: 0
 				}).then(data => {
 					this.commentList = data.data.list;
 					//将评论编号用，连接
@@ -851,7 +881,8 @@
 					})
 				}
 			},
-			focus_dianzan(index) { // 点赞
+			focus_dianzan(index) { // 点赞 （关注）
+				var self = this;
 				if (this.focus_lList[index] == 0) { //未点赞->已点赞
 					this.focus_lList[index] = 1;
 					this.focus_vList[index].likeNumber = (parseInt(this.focus_vList[index].likeNumber == null ? '0' : this.focus_vList[index].likeNumber) +
@@ -862,7 +893,10 @@
 						mediaId: this.focus_vList[index].mediaId
 					}).then(data => {
 						console.log(data)
+						self.focus_queryLikeMediaBusinessId();
+						self.focus_listMedias();
 					})
+					// this.focus_initMedia();
 				} else { //已点赞->取消点赞
 					this.focus_lList[index] = 0;
 					this.focus_vList[index].likeNumber = (parseInt(this.focus_vList[index].likeNumber == null ? '0' : this.focus_vList[index].likeNumber) -
@@ -873,7 +907,10 @@
 						mediaId: this.focus_vList[index].mediaId
 					}).then(data => {
 						console.log(data)
+						self.queryLikeMediaBusinessId();
+						self.listMedias();
 					})
+					// this.initMedia();
 				}
 			},
 			dianzanInComment(i, j) { //在评论中点赞
@@ -929,7 +966,7 @@
 				this.replyInfo = "回复" + info.account;
 				this.$forceUpdate();
 			},
-			reply() {
+			reply() {// 回复
 				request.actionMediaComment({
 					userId: uni.getStorageSync('currentUserId'),
 					mediaId: this.vList[this.videoIndex].mediaId,
@@ -950,6 +987,12 @@
 			},
 			handle(status) {
 				this.verticalIndex = status;
+			},
+			toSearch() {
+				this.destory();
+				uni.navigateTo({
+					url: 'search'
+				})
 			}
 		}
 	}

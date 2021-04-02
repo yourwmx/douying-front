@@ -1,7 +1,7 @@
 <template>
 	<view class="body_view">
 		<view class="top_view">
-			<img :src="ip+info.backgroundUrl" style="width: 100%; height: 200rpx" @click="toUpdateBackgroundUrl()"></img>
+			<img :src="info.backgroundUrl" style="width: 100%; height: 200rpx" @click="toUpdateBackgroundUrl()"></img>
 		</view>
 		<view class="middle_view">
 			<view class="top_line">
@@ -62,7 +62,7 @@
 			<block v-for="(item,index) in mediaInfoList" :key="index">
 				<view style="width: 32%; margin-left: 1%; margin-top: 1%;">
 					<view style="position: relative;">
-						<image style="width: 100%;" :src="ip+item.mediaThumb" @click="toIndex(index)"></image>
+						<image style="width: 100%;" :src="item.mediaThumb" @click="toIndex(index)"></image>
 						<view style="display: flex; position: absolute; bottom: 0; left: 10px;">
 							<view><image src="../../static/image/weidianzan.png" style="width: 20px; height: 20px;"></image></view>
 							<view v-if="item.likeNumber == null" style="color: #FFFFFF; margin-left: 5px;">0</view>
@@ -80,8 +80,8 @@
 	export default {
 		data() {
 			return {
-				ip: "http://127.0.0.1:8080",
-				// ip: "http://47.112.224.214:8080",
+				// ip: "http://127.0.0.1:8080",
+				ip: "http://120.25.107.83:8080",
 				info: {},
 				mediaInfoList: {},
 				userId: 0,
@@ -182,7 +182,7 @@
 					this.status = 1;
 					if(this.current == 0){//改变全局变量（用户对每个用户是否关注）
 						this.$common.setFocus_fList(this.index, 1);
-					}else{
+					}else if(this.current == 1){
 						this.$common.setfList(this.index, 1);
 					}
 					this.$forceUpdate();
@@ -196,7 +196,7 @@
 					this.status = 0;
 					if(this.current == 0){//改变全局变量（用户对每个用户是否关注）
 						this.$common.setFocus_fList(this.index, 0);
-					}else{
+					}else if(this.current == 1){
 						this.$common.setfList(this.index, 0);
 					}
 					this.$forceUpdate();

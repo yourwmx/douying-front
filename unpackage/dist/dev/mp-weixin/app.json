@@ -6,7 +6,8 @@
     "pages/index/takeVideo",
     "pages/index/editData",
     "pages/index/update",
-    "pages/index/updateLocation"
+    "pages/index/updateLocation",
+    "pages/index/search"
   ],
   "subPackages": [],
   "window": {

@@ -32,11 +32,21 @@
         }
         ,{
             "path" : "pages/index/update",
-            "style" : {}
+            "style" : {
+				"navigationBarTitleText": "编辑简介"
+			}
         }
         ,{
             "path" : "pages/index/updateLocation",
-            "style" : {}
+            "style" : {
+				"navigationBarTitleText": "编辑地区"
+			}
+        }
+        ,{
+            "path" : "pages/index/search",
+            "style" : {
+				"navigationBarTitleText": "搜索"
+			}
         }
     ],
 	"globalStyle": {

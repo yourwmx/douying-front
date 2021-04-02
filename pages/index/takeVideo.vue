@@ -6,7 +6,7 @@
 			<image v-if="(imgSrc == 1)" :src="src" :style="{width: 100 + '%', height: phoneHeight - 40 + 'px'}"></image>
 			<cover-view class="xuanzeyinyue"></cover-view>
 			<cover-image class="yinyue" src="../../static/image/yinyue.png" @click="pinglun('open')"></cover-image>
-			<cover-view class="xuanze" @click="drawer('open')">选择音乐</cover-view>
+			<cover-view class="xuanze" @click="drawer('open')">{{content}}</cover-view>
 			<view class="media_introduce" v-if="!showModalStatus">
 				<input v-show="bottomMask" :style="{margin: 10 + 'px', color: '#FFFFFF', width: phoneWidth - 100 + 'px'}" @input="onKeyInput"
 				 placeholder-style="color:#fff" placeholder="留下你的作品介绍吧" />
@@ -21,7 +21,7 @@
 						<view class="drawer_radio">
 							<radio :value="item.musicId+' '+item.musicUrl" :checked="item.checked" />
 						</view>
-						<audio style="text-align: left" :src="ip+item.musicUrl" :poster="item.musicPoster" :name="item.musicName" :author="item.musicAuthor"
+						<audio style="text-align: left" :src="item.musicUrl" :poster="item.musicPoster" :name="item.musicName" :author="item.musicAuthor"
 						 controls></audio>
 					</label>
 				</radio-group>
@@ -40,8 +40,8 @@
 	export default {
 		data() {
 			return {
-				ip: "http://127.0.0.1:8080",
-				// ip: "http://47.112.224.214:8080",
+				// ip: "http://127.0.0.1:8080",
+				ip: "http://120.25.107.83:8080",
 				src: "",
 				thumbTempFilePath: "",
 				fileType: "",
@@ -55,7 +55,8 @@
 				mergeMusicId: "",
 				mergeMusicUrl: "",
 				mediaDuration: 0,
-				inputValue: ""
+				inputValue: "",
+				content: '选择音乐'
 			}
 		},
 		onLoad: function(res) {
@@ -87,6 +88,7 @@
 					_this.phoneWidth = res.windowWidth;
 				}
 			});
+			this.content = '选择音乐';
 		},
 		methods: {
 			uploadfile() {
@@ -176,19 +178,21 @@
 			},
 			listMusics() {
 				// 加载音乐列表
-				request.listMusics({}).then(data => {
+				request.listMusics({
+					pageSize: 100,
+					pageNum: 1
+				}).then(data => {
 					console.log(data);
-					this.items = data.data;
+					this.items = data.data.list;
 					console.log(data.data)
 				});
 			},
 			radioChange: function(e) {
-				console.log(e.target.value);
+				console.log('100',e);
 				let item = e.target.value;
 				let newItem = item.split(" ");
-				console.log(newItem)
 				this.mergeMusicId = newItem[0];
-				this.mergeMusicUrl = this.ip + newItem[1];
+				this.mergeMusicUrl = newItem[1];
 			},
 			merge() {
 				if (this.mergeMusicUrl == "") {
@@ -199,8 +203,15 @@
 					return;
 				}
 				this.drawer("close");
-				console.log(this.src);
-				console.log(this.mergeMusicUrl);
+				console.log(this.items);
+				for(var i = 0; i < this.items.length; i++){
+					if(this.mergeMusicId == this.items[i].musicId){
+						this.content = this.items[i].musicName;
+						this.$forceUpdate();
+						break;
+					}
+				}
+				console.log(this.mergeMusicId);
 				// 创建背景音乐
 				const innerAudioContext = uni.createInnerAudioContext();
 				innerAudioContext.autoplay = true;

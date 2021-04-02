@@ -1,5 +1,5 @@
-const commonUrl ="http://127.0.0.1:8080"  //公共路径
-// const commonUrl ="https://127.0.0.1:8080"  //公共路径
+// const commonUrl ="http://127.0.0.1:8080"  //公共路径
+const commonUrl ="http://120.25.107.83:8080"  //公共路径
 // post请求封装
 function postRequest(url, data) {
 	var promise = new Promise((resolve, reject) => {

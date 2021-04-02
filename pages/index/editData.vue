@@ -122,6 +122,7 @@
 					birthday: this.info.birthday,
 					locationId: this.info.locationId,
 					backgroundUrl: this.info.backgroundUrl,
+					photo: this.info.photo,
 					version: this.info.version
 				}).then(data => {
 					uni.redirectTo({
